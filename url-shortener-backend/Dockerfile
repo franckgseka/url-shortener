@@ -1,0 +1,35 @@
+# Utiliser une image officielle de Go comme build stage
+FROM golang:1.18-alpine AS build
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers go mod et sum
+COPY go.mod go.sum ./
+
+# Télécharger toutes les dépendances
+RUN go mod download
+
+# Copier le code source dans l'image
+COPY . .
+
+# Compiler l'application
+RUN go build -o /url-shortener-backend
+
+# Utiliser une image plus petite pour exécuter l'application
+FROM alpine:latest
+
+# Créer un répertoire pour l'application
+WORKDIR /root/
+
+# Copier le binaire de l'application depuis le build stage
+COPY --from=build /url-shortener-backend .
+
+# Copier le fichier de base de données
+COPY urls.db .
+
+# Exposer le port sur lequel l'application sera disponible
+EXPOSE 8080
+
+# Commande pour démarrer l'application
+CMD ["./url-shortener-backend"]
