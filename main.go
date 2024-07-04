@@ -14,6 +14,7 @@ func main() {
 
     r.POST("/shorten", handlers.CreateShortURL)
     r.GET("/:shortURL", handlers.ResolveShortURL)
+    r.GET("/stats", handlers.GetStatistics)
 
     r.Run(":8080")
 }
