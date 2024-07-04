@@ -35,5 +35,15 @@ func ResolveShortURL(c *gin.Context) {
         return
     }
 
+    // Incrémenter le compteur de clics
+    database.DB.Model(&url).Update("clicks", url.Clicks+1)
+
     c.Redirect(http.StatusMovedPermanently, url.LongURL)
+}
+
+func GetStatistics(c *gin.Context) {
+    var urls []models.URL
+    database.DB.Find(&urls)
+
+    c.JSON(http.StatusOK, urls)
 }
