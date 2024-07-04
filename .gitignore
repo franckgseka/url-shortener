@@ -2,7 +2,7 @@
 
 # dependencies
 
-frontend/node_modules
+dede/node_modules
 
 # testing
 /coverage
