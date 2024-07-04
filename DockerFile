@@ -1,0 +1,24 @@
+# Utiliser une image de base Golang
+FROM golang:1.20
+
+# Définir le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copier le go.mod et le go.sum dans le répertoire de travail
+COPY go.mod ./
+COPY go.sum ./
+
+# Télécharger les dépendances Go
+RUN go mod download
+
+# Copier le reste des fichiers du projet
+COPY . .
+
+# Construire l'application
+RUN go build -o /url-shortener
+
+# Exposer le port sur lequel l'application écoute
+EXPOSE 8080
+
+# Commande pour exécuter l'application
+CMD ["/url-shortener"]
