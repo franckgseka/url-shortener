@@ -21,7 +21,14 @@ func CreateShortURL(c *gin.Context) {
 
     shortURL := uuid.New().String()[:6]
 
-    url := models.URL{LongURL: req.LongURL, ShortURL: shortURL}
+    username, _ := c.Get("username")
+    var user models.User
+    if result := database.DB.Where("username = ?", username).First(&user); result.Error != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+        return
+    }
+
+    url := models.URL{LongURL: req.LongURL, ShortURL: shortURL, UserID: user.ID}
     database.DB.Create(&url)
 
     c.JSON(http.StatusOK, gin.H{"short_url": shortURL})
@@ -39,11 +46,4 @@ func ResolveShortURL(c *gin.Context) {
     database.DB.Model(&url).Update("clicks", url.Clicks+1)
 
     c.Redirect(http.StatusMovedPermanently, url.LongURL)
-}
-
-func GetStatistics(c *gin.Context) {
-    var urls []models.URL
-    database.DB.Find(&urls)
-
-    c.JSON(http.StatusOK, urls)
 }

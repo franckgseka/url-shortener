@@ -12,9 +12,17 @@ func main() {
     // Initialize the database
     database.Init()
 
-    r.POST("/shorten", handlers.CreateShortURL)
+    r.POST("/signup", handlers.SignUp)
+    r.POST("/login", handlers.Login)
+
+    authorized := r.Group("/")
+    authorized.Use(handlers.AuthMiddleware())
+    {
+        authorized.POST("/shorten", handlers.CreateShortURL)
+        authorized.GET("/stats", handlers.GetStatistics)
+    }
+
     r.GET("/:shortURL", handlers.ResolveShortURL)
-    r.GET("/stats", handlers.GetStatistics)
 
     r.Run(":8080")
 }
